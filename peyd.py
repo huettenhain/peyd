@@ -8,16 +8,23 @@ class PEiDSignature:
         try:
             return re.escape(bytes.fromhex(signature_item))
         except:
+            # construct a regular expression pattern from this PEiD database 
+            # sequence. This used to be more readable with binary string
+            # formatting, but has been made less comprehensible for backwards
+            # compatibility. I am sorry.
             pattern_match = re.match(r'([A-F0-9])\?', signature_item)
             if pattern_match:
+                # Pattern 3? yields RE: [\x30-\x3F]
                 b = pattern_match.group(1)
-                return b'['+bytes.fromhex(b+'0')+b'-'+bytes.fromhex(b+'F')+b']'
+                return b'[' + bytes.fromhex(b+'0' ) +b'-' + bytes.fromhex(b+'F') + b']'
             pattern_match = re.match(r'\?([A-F0-9])', signature_item)
             if pattern_match:
+                # Pattern ?3 yields RE: [\x03\x13\x23\x33\x43\x53\x63\x73\x83\x93\xA3\xB3\xC3\xD3\xE3\xF3]
                 x = pattern_match.group(1)
                 return b'[' + re.escape(bytes.fromhex(''.join(b + x for b in "0123456789ABCDEF"))) + b']'
             pattern_match = re.match('V(\d)', signature_item)
             if pattern_match:
+                # Pattern V3 yields RE: (?P<v3>.)
                 return b'(?P<v'+pattern_match.group(1).encode()+b'>.)'
             return b'.'
 
