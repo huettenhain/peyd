@@ -66,7 +66,7 @@ class PEiDSignature:
         self.__pattern_init()
         entrypoint = pe_object.OPTIONAL_HEADER.AddressOfEntryPoint
         if self.ep_only:
-            for section in pe.sections:
+            for section in pe_object.sections:
                 if section.contains_rva(entrypoint):
                     bytes = section.get_data(entrypoint, len(self))
                     return self.pattern.match(bytes)
