@@ -1,5 +1,4 @@
 import sys, re, pefile 
-from base64 import b16decode as unhex
 
 class PEiDSignature:
 
@@ -7,19 +6,19 @@ class PEiDSignature:
         if signature_item == '??':
             return b'.'
         try:
-            return re.escape(unhex(signature_item))
+            return re.escape(bytes.fromhex(signature_item))
         except:
             pattern_match = re.match(r'([A-F0-9])\?', signature_item)
             if pattern_match:
                 b = pattern_match.group(1)
-                return b'[%c-%c]' % tuple(unhex(b + x) for x in "0F")
+                return b'['+bytes.fromhex(b+'0')+b'-'+bytes.fromhex(b+'F')+b']'
             pattern_match = re.match(r'\?([A-F0-9])', signature_item)
             if pattern_match:
                 x = pattern_match.group(1)
-                return b'[%s]' % re.escape(unhex(''.join(b + x for b in "0123456789ABCDEF")))
+                return b'[' + re.escape(bytes.fromhex(''.join(b + x for b in "0123456789ABCDEF"))) + b']'
             pattern_match = re.match('V(\d)', signature_item)
             if pattern_match:
-                return b'(?P<v%d>.)' % int(pattern_match.group(1))
+                return b'(?P<v'+pattern_match.group(1).encode()+b'>.)'
             return b'.'
 
     def __len__(self):
