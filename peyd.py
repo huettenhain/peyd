@@ -2,7 +2,7 @@ import sys, re, pefile
 
 class PEiDSignature:
 
-    def __parse_sig_item(self, signature_item):
+    def __peid_sig_to_regexp(self, signature_item):
         if signature_item == '??':
             return b'.'
         try:
@@ -53,7 +53,7 @@ class PEiDSignature:
     def __pattern_init(self):
         if self.pattern is None:
             self.pattern = re.compile(b''.join(
-                self.__parse_sig_item(x) for x in self.sequence))
+                self.__peid_sig_to_regexp(x) for x in self.sequence))
 
     def match_stream(self, bytes):
         self.__pattern_init()
